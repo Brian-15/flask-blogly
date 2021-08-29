@@ -62,6 +62,7 @@ def get_user_profile(id):
 
 @app.route('/users/<int:id>/edit', methods = ['GET'])
 def edit_user_form(id):
+    """Show user edit form"""
 
     user = User.query.get_or_404(id)
     return render_template("edit_user.html", user=user)
@@ -76,5 +77,14 @@ def submit_user_edit(id):
 
     user = User.query.get_or_404(id)
     user.update(first_name, last_name, img_url)
-    
+
+    return redirect('/users')
+
+@app.route('/users/<int:id>/delete', methods = ['POST'])
+def delete_user(id):
+    """Delete user from database"""
+
+    User.query.get_or_404(id).delete()
+    db.session.commit()
+
     return redirect('/users')

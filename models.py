@@ -35,6 +35,7 @@ class User(db.Model):
 
     def update(self, first_name, last_name, image_url):
         """Update user info with new values"""
+
         self.first_name = first_name
         self.last_name = last_name
         self.image_url = image_url

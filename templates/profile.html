@@ -4,7 +4,10 @@
 
 <img src="{{user.image_url}}" alt="profile image">
 <h1>{{user.first_name}} {{user.last_name}}</h1>
-<a href="/users/{{user.id}}/edit" method="post">Edit</a>
-<a href="/users/{{user.id}}/delete" method="post">Delete</a>
+<a href="/users/{{user.id}}/edit">Edit</a>
+<form action="/users/{{user.id}}/delete" method="post">
+    <button type="submit">Delete</button>
+</form>
+
 
 {% endblock %}
