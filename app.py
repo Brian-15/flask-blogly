@@ -84,7 +84,7 @@ def submit_user_edit(id):
 def delete_user(id):
     """Delete user from database"""
 
-    User.query.get_or_404(id).delete()
+    User.query.filter_by(id=id).delete()
     db.session.commit()
 
     return redirect('/users')
