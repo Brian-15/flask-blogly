@@ -52,3 +52,29 @@ def submit_user_form():
     db.session.commit()
 
     return redirect('/users')
+
+@app.route('/users/<int:id>', methods = ['GET'])
+def get_user_profile(id):
+
+    user = User.query.get_or_404(id)
+
+    return render_template("profile.html", user=user)
+
+@app.route('/users/<int:id>/edit', methods = ['GET'])
+def edit_user_form(id):
+
+    user = User.query.get_or_404(id)
+    return render_template("edit_user.html", user=user)
+
+@app.route('/users/<int:id>/edit', methods = ['POST'])
+def submit_user_edit(id):
+    """Update new user data"""
+
+    first_name = request.form["first-name"]
+    last_name = request.form["last-name"]
+    img_url = request.form["img-url"]
+
+    user = User.query.get_or_404(id)
+    user.update(first_name, last_name, img_url)
+    
+    return redirect('/users')

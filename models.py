@@ -32,3 +32,12 @@ class User(db.Model):
 
         u = self
         return f"<User {u.id} {u.first_name} {u.last_name} {u.image_url}>"
+
+    def update(self, first_name, last_name, image_url):
+        """Update user info with new values"""
+        self.first_name = first_name
+        self.last_name = last_name
+        self.image_url = image_url
+
+        db.session.add(self)
+        db.session.commit()
