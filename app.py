@@ -47,7 +47,6 @@ def submit_user_form():
     print(request.form)
 
     new_user = User(first_name=first_name, last_name=last_name, image_url=img_url)
-    print(new_user)
     db.session.add(new_user)
     db.session.commit()
 
