@@ -2,7 +2,7 @@
 
 from unittest import TestCase
 from app import app
-from models import User, db
+from models.user import User, db
 
 class BloglyTestCase(TestCase):
 
