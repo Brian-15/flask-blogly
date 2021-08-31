@@ -138,7 +138,6 @@ def submit_edit(id):
 def delete_post(id):
 
     post = Post.query.filter_by(id=id)
-    print(post)
     user_id = Post.query.get_or_404(id).user_id
 
     post.delete()

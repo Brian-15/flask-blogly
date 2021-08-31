@@ -34,8 +34,11 @@ class Post(db.Model):
     def update(self, title, content):
         """Update user info with new values"""
 
-        self.title = title
-        self.content = content
+        if (title):
+            self.title = title
+        
+        if (content):
+            self.content = content
 
         db.session.add(self)
         db.session.commit()
