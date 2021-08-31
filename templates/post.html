@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1>{{post.title}}</h1>
+
+<main>{{post.content}}</main>
+
+<p><i>{{post.user.full_name()}}</i></p>
+
+{% endblock %}

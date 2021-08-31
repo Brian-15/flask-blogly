@@ -2,6 +2,7 @@
 
 from flask import Flask, request, render_template, redirect
 from models.user import db, connect_db, User
+from models.post import Post
 from flask_debugtoolbar import DebugToolbarExtension
 
 
@@ -56,8 +57,9 @@ def submit_user_form():
 def get_user_profile(id):
 
     user = User.query.get_or_404(id)
+    posts = user.posts
 
-    return render_template("profile.html", user=user)
+    return render_template("profile.html", user=user, posts=posts)
 
 @app.route('/users/<int:id>/edit', methods = ['GET'])
 def edit_user_form(id):
@@ -87,3 +89,11 @@ def delete_user(id):
     db.session.commit()
 
     return redirect('/users')
+
+@app.route('/post/<int:id>')
+def view_post(id):
+    """display blog post"""
+
+    post = Post.query.get_or_404(id)
+
+    return render_template('post.html', post=post)
