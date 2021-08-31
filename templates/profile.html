@@ -4,22 +4,26 @@
 
 <img src="{{user.image_url}}" alt="profile image">
 <h1>{{user.full_name()}}</h1>
-<a href="/users/{{user.id}}/edit">Edit</a>
-<form action="/users/{{user.id}}/delete" method="post">
-    <button type="submit">Delete</button>
-</form>
+<div>
+    <a class="btn btn-primary" href="/users/{{user.id}}/edit">Edit</a>
+    <form action="/users/{{user.id}}/delete" method="post">
+        <button class="btn btn-primary" type="submit">Delete</button>
+    </form>
+</div>
 
 <h2>Posts</h2>
 {% if posts %}
 <ul>
     {% for post in posts %}
     <li>
-        <a href="/post/{{post.id}}">{{post.title}}</a>
+        <a href="/posts/{{post.id}}">{{post.title}}</a>
     </li>
     {% endfor %}
 </ul>
 {% else %}
 <p>No posts to display</p>
 {% endif %}
+
+<a class="btn btn-primary" href="/users">Back</a>
 
 {% endblock %}

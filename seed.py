@@ -12,9 +12,9 @@ db.create_all()
 User.query.delete()
 
 # Add a few sample users
-user1 = User(first_name="John", last_name="Smith")
-user2 = User(first_name="Jane", last_name="Smith")
-user3 = User(first_name="Splenda", last_name="Bumblebatch")
+user1 = User(first_name="John", last_name="Smith", image_url="https://images.unsplash.com/photo-1529665253569-6d01c0eaf7b6?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1876&q=80")
+user2 = User(first_name="Jane", last_name="Smith", image_url="https://images.unsplash.com/photo-1474552226712-ac0f0961a954?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=751&q=80")
+user3 = User(first_name="Splenda", last_name="Bumblebatch", image_url="https://images.unsplash.com/photo-1579783483458-83d02161294e?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1928&q=80")
 
 # Add user data to staging area
 db.session.add(user1)

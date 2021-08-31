@@ -30,3 +30,12 @@ class Post(db.Model):
 
         p = self
         return f"<Post {p.id} {p.title} {p.created_at}>"
+    
+    def update(self, title, content):
+        """Update user info with new values"""
+
+        self.title = title
+        self.content = content
+
+        db.session.add(self)
+        db.session.commit()

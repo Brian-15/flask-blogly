@@ -5,7 +5,6 @@ from models.user import db, connect_db, User
 from models.post import Post
 from flask_debugtoolbar import DebugToolbarExtension
 
-
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///blogly'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -90,10 +89,59 @@ def delete_user(id):
 
     return redirect('/users')
 
-@app.route('/post/<int:id>')
+@app.route('/users/<int:id>/posts/new', methods=['GET'])
+def post_form(id):
+    """Show form to add a post for user whose id=id"""
+
+    user = User.query.get_or_404(id)
+
+    return render_template('new_post.html', user=user)
+
+@app.route('/users/<int:id>/posts/new', methods=['POST'])
+def post_form_submit(id):
+    """Handle new post submission"""
+
+    title = request.form["title"]
+    content = request.form["content"]
+
+    new_post = Post(title=title, content=content, user_id=id)
+    db.session.add(new_post)
+    db.session.commit()
+
+    return redirect(f"/users/{id}")
+
+@app.route('/posts/<int:id>', methods=['GET'])
 def view_post(id):
     """display blog post"""
 
     post = Post.query.get_or_404(id)
 
     return render_template('post.html', post=post)
+
+@app.route('/posts/<int:id>/edit', methods=['GET'])
+def edit_post(id):
+
+    return render_template('edit_post.html', id=id)
+
+@app.route('/posts/<int:id>/edit', methods=['POST'])
+def submit_edit(id):
+
+    title = request.form["title"]
+    content = request.form["content"]
+
+    edited_post = Post.query.get_or_404(id)
+    edited_post.update(title, content)
+
+    return redirect(f"/posts/{id}")
+
+@app.route('/posts/<int:id>/delete')
+def delete_post(id):
+
+    post = Post.query.filter_by(id=id)
+    print(post)
+    user_id = Post.query.get_or_404(id).user_id
+
+    post.delete()
+    db.session.commit()
+
+    return redirect(f"/users/{user_id}")
