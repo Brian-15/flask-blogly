@@ -1,7 +1,6 @@
 """Seed file - initialize data into database"""
 
-from models.user import User, db
-from models.post import Post
+from models import User, Post, db
 from app import app
 
 # Initialize tables

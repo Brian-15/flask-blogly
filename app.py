@@ -1,9 +1,9 @@
 """Blogly application."""
 
 from flask import Flask, request, render_template, redirect
-from models.user import db, connect_db, User
-from models.post import Post
+from models import db, connect_db, User, Post
 from flask_debugtoolbar import DebugToolbarExtension
+from werkzeug.exceptions import HTTPException
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///blogly'
@@ -25,9 +25,8 @@ def home():
 @app.route('/users', methods=['GET'])
 def user_list():
     """Get list of all users"""
-
+    
     users = User.query.all()
-    print(len(users))
     return render_template("users.html", users=users)
 
 @app.route('/users/new', methods=['GET'])
@@ -43,8 +42,6 @@ def submit_user_form():
     first_name = request.form["first-name"]
     last_name = request.form["last-name"]
     img_url = request.form["img-url"]
-
-    print(request.form)
 
     new_user = User(first_name=first_name, last_name=last_name, image_url=img_url)
     db.session.add(new_user)
@@ -144,3 +141,11 @@ def delete_post(id):
     db.session.commit()
 
     return redirect(f"/users/{user_id}")
+
+@app.errorhandler(Exception)
+def error_page(e):
+
+    if isinstance(e, HTTPException):
+        return render_template('error.html', error=e)
+
+    return render_template('error.html', error=e), 500

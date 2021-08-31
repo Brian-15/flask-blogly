@@ -2,10 +2,11 @@
 
 from unittest import TestCase
 from app import app
-from models.user import User, db
+from models import User, Post, db
 
-class BloglyTestCase(TestCase):
-
+class BloglyUserTestCase(TestCase):
+    """test cases for user routes"""
+    
     def setUp(self):
         """Empty table"""
 
@@ -103,8 +104,6 @@ class BloglyTestCase(TestCase):
                 [user.full_name(), user.image_url],
                 ["EDITED_FIRST_NAME EDITED_LAST_NAME", "https://unsplash.com/photos/Up5a1cLjFPs"])
 
-
-
     def test_user_delete(self):
         """test user deletion"""
         with app.test_client() as client:
@@ -114,5 +113,45 @@ class BloglyTestCase(TestCase):
             self.assertEqual(response.status_code, 200)
             self.assertNotIn('FIRST_NAME LAST_NAME', html)
 
-
+class BloglyPostTestCase(TestCase):
+    """test cases for routes involving users adn their posts"""
     
+    def setUp(self):
+        """empty tables, set up sample user and post models"""
+
+        User.query.delete()
+        Post.query.delete()
+
+        test_user = User(first_name='FIRST_NAME',
+                         last_name='LAST_NAME',
+                         image_url='https://unsplash.com/photos/2LowviVHZ-E')
+        
+        test_post = Post(title='TITLE',
+                         content='CONTENT',
+                         user_id=test_user.id)
+        
+        db.session.add(test_user)
+        db.session.commit()
+
+        db.session.add(test_post)
+        db.session.commit()
+
+        self.user_id = test_user.id
+        self.post_id = test_post.id
+
+    def tearDown(self):
+        """rollback database"""
+        db.session.rollback()
+
+    def test_new_post_form(self):
+        """test post form display"""
+
+        with app.test_client() as client:
+
+            response = client.get(f"/users/{self.user_id}/posts/new")
+            html = response.get_data(as_text=True)
+
+            user = User.query.get(self.user_id)
+
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(f"<h1>Add post for {user.full_name()}</h1>", html)

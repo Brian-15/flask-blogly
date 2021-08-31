@@ -1,8 +1,14 @@
-h1 {
-    margin: auto;
+body {
+    margin: 1em;
 }
 
-div, a {
+div {
+    display: flex;
+    flex-direction: row;
+    padding: 1em;
+}
+
+.btn {
     margin: 1em;
 }
 

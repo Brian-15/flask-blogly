@@ -1,6 +1,8 @@
 """Models for Blogly."""
 
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.orm import backref
+from sqlalchemy.sql.schema import ForeignKey
 
 db = SQLAlchemy()
 
@@ -26,6 +28,8 @@ class User(db.Model):
                           nullable=False)
     
     image_url = db.Column(db.String())
+
+    posts = db.relationship('Post', backref='user')
     
     def __repr__(self):
         """Show info about user"""
@@ -50,3 +54,42 @@ class User(db.Model):
 
     def full_name(self):
         return f"{self.first_name} {self.last_name}"
+
+class Post(db.Model):
+    """Post model class"""
+
+    __tablename__ = "posts"
+
+    id = db.Column(db.Integer,
+                   primary_key=True,
+                   autoincrement=True)
+    
+    title = db.Column(db.String(),
+                      nullable=False)
+    
+    content = db.Column(db.Text,
+                        nullable=False)
+    
+    created_at = db.Column(db.DateTime,
+                           nullable=False)
+    
+    user_id = db.Column(db.Integer,
+                        db.ForeignKey('users.id'))
+    
+    def __repr__(self):
+        """Show info about post"""
+
+        p = self
+        return f"<Post {p.id} {p.title} {p.created_at}>"
+    
+    def update(self, title, content):
+        """Update user info with new values"""
+
+        if (title):
+            self.title = title
+        
+        if (content):
+            self.content = content
+
+        db.session.add(self)
+        db.session.commit()
