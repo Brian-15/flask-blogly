@@ -144,6 +144,55 @@ def delete_post(id):
 
     return redirect(f"/users/{user_id}")
 
+
+# Tag routes
+
+@app.route('/tags', methods=['GET'])
+def list_tags():
+    """List all tags"""
+
+
+    return render_template('tags.html', tags=tags)
+
+@app.route('/tags/<int:id>', methods=['GET'])
+def show_tag(id):
+    """Show tag details"""
+
+
+    return render_template('tag.html', tag=tag)
+
+@app.route('/tags/new', methods=['GET'])
+def new_tag():
+    """Display new tag form"""
+
+    return render_template('new_tag.html')
+
+@app.route('/tags/new', methods=['POST'])
+def submit_new_tag():
+    """handle new tag submission"""
+
+    return redirect('/tags')
+
+@app.route('/tags/<int:id>/edit', methods=['GET'])
+def edit_tag(id):
+    """display tag edit form"""
+
+    return render_template('edit_tag.html', name=name)
+
+@app.route('/tags/<int:id>/edit', methods=['POST'])
+def submit_edit_tag(id):
+    """handle edited tag submission"""
+
+    return redirect('/tags')
+
+@app.route('/tags/<int:id>/delete', methods=['POST'])
+def delete_tag(id):
+    """delete tag"""
+
+    redirect('/tags')
+
+# Universal error route
+
 @app.errorhandler(Exception)
 def error_page(e):
 
