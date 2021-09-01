@@ -12,6 +12,19 @@
         <label for="content">Post Content</label>
         <input type="text" name="content" id="content">
     </div>
+    {% if tags %}
+    
+    {% for tag in tags%}
+    <div>
+        <input type="checkbox" name="{{tag.name}}" id="{{tag.name}}">
+        <label for="{{tag.name}}">{{tag.name}}</label>
+    </div>
+    {% endfor %}
+
+    {% else %}
+    <p>No tags are currently available</p>
+    {% endif %}
+    
     <a class="btn btn-secondary" href="/posts/{{id}}">Cancel</a>
     <button class="btn btn-primary" type="submit">Edit</button>
 </form>
