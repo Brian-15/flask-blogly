@@ -81,6 +81,8 @@ def submit_user_edit(id):
 def delete_user(id):
     """Delete user from database"""
 
+    Post.query.filter_by(user_id=id).delete()
+
     User.query.filter_by(id=id).delete()
     db.session.commit()
 
