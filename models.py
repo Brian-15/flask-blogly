@@ -58,6 +58,22 @@ class User(db.Model):
     def full_name(self):
         return f"{self.first_name} {self.last_name}"
 
+    @classmethod
+    def remove_user(self, id):
+
+        # PostTag.query.filter_by() TODO
+
+        Post.remove_user_posts(id)
+
+        self.query.filter_by(id=id).delete()
+
+        # Post.query.filter_by(user_id=id).delete()
+
+        # User.query.filter_by(id=id).delete()
+
+        db.session.commit()
+
+
 class Post(db.Model):
     """Post model class"""
 
@@ -99,6 +115,29 @@ class Post(db.Model):
 
         db.session.add(self)
         db.session.commit()
+    
+    @classmethod
+    def remove_post(self, id):
+        """Removes post from database, and returns author's ID number"""
+
+        post = Post.query.filter_by(id=id)
+        user_id = Post.query.get_or_404(id).user_id
+
+        PostTag.delete_posts(id)
+
+        post.delete()
+        db.session.commit()
+
+        return user_id
+
+    @classmethod
+    def remove_user_posts(self, user_id):
+
+        posts = Post.query.filter_by(user_id=user_id).all()
+
+        for post in posts:
+            Post.remove_post(post.id)
+
 
 class Tag(db.Model):
     """Tag model class"""
@@ -118,6 +157,22 @@ class Tag(db.Model):
     name = db.Column(db.Text,
                      nullable=False,
                      unique=True)
+
+    def update(self, name):
+        """Update user info with new values"""
+
+        self.name = name
+
+        db.session.add(self)
+        db.session.commit()
+    
+    @classmethod
+    def remove_tag(self, id):
+
+        PostTag.delete_tags(id)
+        Tag.query.filter_by(id=id).delete()
+        db.session.commit()
+        
     
 
 class PostTag(db.Model):
@@ -137,4 +192,18 @@ class PostTag(db.Model):
     tag_id = db.Column(db.Integer,
                        db.ForeignKey("tags.id"),
                        primary_key=True)
+    
+    @classmethod
+    def delete_tags(self, tag_id):
+        """Delete relevant tags"""
+
+        PostTag.query.filter_by(tag_id=tag_id).delete()
+        db.session.commit()
+    
+    @classmethod
+    def delete_posts(self, post_id):
+        """Delete relevant posts"""
+
+        PostTag.query.filter_by(post_id=post_id).delete()
+        db.session.commit()
 

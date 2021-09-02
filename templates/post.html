@@ -11,7 +11,10 @@
 <div>
     <a class="btn btn-primary" href="/users/{{post.user_id}}">Cancel</a>
     <a class="btn btn-secondary" href="/posts/{{post.id}}/edit">Edit</a>
-    <a class="btn btn-danger" href="/posts/{{post.id}}/delete">Delete</a>
+    <form action="/posts/{{post.id}}/delete" method="post">
+        <button type="submit" class="btn btn-danger">Delete</button>
+    </form>
+    
 </div>
 
 {% endblock %}

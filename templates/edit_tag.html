@@ -3,11 +3,11 @@
 {% block content %}
 <h1>Edit a tag</h1>
 
-<form action="/tags/new" method="post">
+<form action="/tags/{{tag.id}}/edit" method="post">
     <label for="tag-name">Name</label>
-    <input type="text" name="tag-name" id="tag-name" placeholder="{{name}}">
+    <input type="text" name="tag-name" id="tag-name" placeholder="{{tag.name}}">
+    <button class="btn btn-primary" type="submit">Edit</button>
     <a class="btn btn-secondary" href="/tags">Cancel</a>
-    <button class="btn btn-primary" type="submit">Add</button>
 </form>
 
 {% endblock %}s

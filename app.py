@@ -1,7 +1,7 @@
 """Blogly application."""
 
 from flask import Flask, request, render_template, redirect
-from models import db, connect_db, User, Post
+from models import db, connect_db, User, Post, Tag, PostTag
 from flask_debugtoolbar import DebugToolbarExtension
 from werkzeug.exceptions import HTTPException
 
@@ -16,18 +16,7 @@ debug = DebugToolbarExtension(app)
 connect_db(app)
 db.create_all()
 
-@app.route('/', methods=['GET'])
-def home():
-    """Home page, redirect to /users"""
-
-    return redirect('/users')
-
-@app.route('/users', methods=['GET'])
-def user_list():
-    """Get list of all users"""
-    
-    users = User.query.all()
-    return render_template("users.html", users=users)
+# Create
 
 @app.route('/users/new', methods=['GET'])
 def show_user_form():
@@ -45,45 +34,6 @@ def submit_user_form():
 
     new_user = User(first_name=first_name, last_name=last_name, image_url=img_url)
     db.session.add(new_user)
-    db.session.commit()
-
-    return redirect('/users')
-
-@app.route('/users/<int:id>', methods = ['GET'])
-def get_user_profile(id):
-
-    user = User.query.get_or_404(id)
-    posts = user.posts
-
-    return render_template("profile.html", user=user, posts=posts)
-
-@app.route('/users/<int:id>/edit', methods = ['GET'])
-def edit_user_form(id):
-    """Show user edit form"""
-
-    user = User.query.get_or_404(id)
-    return render_template("edit_user.html", user=user)
-
-@app.route('/users/<int:id>/edit', methods = ['POST'])
-def submit_user_edit(id):
-    """Update new user data"""
-
-    first_name = request.form["first-name"]
-    last_name = request.form["last-name"]
-    img_url = request.form["img-url"]
-
-    user = User.query.get_or_404(id)
-    user.update(first_name, last_name, img_url)
-
-    return redirect('/users')
-
-@app.route('/users/<int:id>/delete', methods = ['POST'])
-def delete_user(id):
-    """Delete user from database"""
-
-    Post.query.filter_by(user_id=id).delete()
-
-    User.query.filter_by(id=id).delete()
     db.session.commit()
 
     return redirect('/users')
@@ -109,58 +59,6 @@ def post_form_submit(id):
 
     return redirect(f"/users/{id}")
 
-@app.route('/posts/<int:id>', methods=['GET'])
-def view_post(id):
-    """display blog post"""
-
-    post = Post.query.get_or_404(id)
-
-    return render_template('post.html', post=post)
-
-@app.route('/posts/<int:id>/edit', methods=['GET'])
-def edit_post(id):
-
-    return render_template('edit_post.html', id=id)
-
-@app.route('/posts/<int:id>/edit', methods=['POST'])
-def submit_edit(id):
-
-    title = request.form["title"]
-    content = request.form["content"]
-
-    edited_post = Post.query.get_or_404(id)
-    edited_post.update(title, content)
-
-    return redirect(f"/posts/{id}")
-
-@app.route('/posts/<int:id>/delete')
-def delete_post(id):
-
-    post = Post.query.filter_by(id=id)
-    user_id = Post.query.get_or_404(id).user_id
-
-    post.delete()
-    db.session.commit()
-
-    return redirect(f"/users/{user_id}")
-
-
-# Tag routes
-
-@app.route('/tags', methods=['GET'])
-def list_tags():
-    """List all tags"""
-
-
-    return render_template('tags.html', tags=tags)
-
-@app.route('/tags/<int:id>', methods=['GET'])
-def show_tag(id):
-    """Show tag details"""
-
-
-    return render_template('tag.html', tag=tag)
-
 @app.route('/tags/new', methods=['GET'])
 def new_tag():
     """Display new tag form"""
@@ -171,25 +69,155 @@ def new_tag():
 def submit_new_tag():
     """handle new tag submission"""
 
+    name = request.form["tag-name"]
+
+    tag = Tag(name=name)
+
+    db.session.add(tag)
+    db.session.commit()
+
     return redirect('/tags')
+
+
+# Read
+
+@app.route('/', methods=['GET'])
+def home():
+    """Home page, redirect to /users"""
+
+    return redirect('/users')
+
+@app.route('/users', methods=['GET'])
+def user_list():
+    """Get list of all users"""
+    
+    users = User.query.all()
+    return render_template("users.html", users=users)
+
+@app.route('/users/<int:id>', methods = ['GET'])
+def get_user_profile(id):
+    """Displays user profile"""
+
+    user = User.query.get_or_404(id)
+    posts = user.posts
+
+    return render_template("profile.html", user=user, posts=posts)
+
+@app.route('/posts/<int:id>', methods=['GET'])
+def view_post(id):
+    """Displays blog post details"""
+
+    post = Post.query.get_or_404(id)
+
+    return render_template('post.html', post=post)
+
+@app.route('/tags', methods=['GET'])
+def list_tags():
+    """List all tags"""
+
+    tags = Tag.query.all()
+
+    return render_template('tags.html', tags=tags)
+
+@app.route('/tags/<int:id>', methods=['GET'])
+def show_tag(id):
+    """Show tag details"""
+
+    tag = Tag.query.get_or_404(id)
+
+    return render_template('tag.html', tag=tag)
+# Update
+
+@app.route('/users/<int:id>/edit', methods = ['GET'])
+def edit_user_form(id):
+    """Show user edit form"""
+
+    user = User.query.get_or_404(id)
+    return render_template("edit_user.html", user=user)
+
+@app.route('/users/<int:id>/edit', methods = ['POST'])
+def submit_user_edit(id):
+    """Update new user data"""
+
+    first_name = request.form["first-name"]
+    last_name = request.form["last-name"]
+    img_url = request.form["img-url"]
+
+    user = User.query.get_or_404(id)
+    user.update(first_name, last_name, img_url)
+
+    return redirect('/users')
+
+@app.route('/posts/<int:id>/edit', methods=['GET'])
+def edit_post(id):
+    """Show post edit form"""
+    return render_template('edit_post.html', id=id)
+
+@app.route('/posts/<int:id>/edit', methods=['POST'])
+def submit_edit(id):
+    """Updates post"""
+    title = request.form["title"]
+    content = request.form["content"]
+
+    edited_post = Post.query.get_or_404(id)
+    edited_post.update(title, content)
+
+    return redirect(f"/posts/{id}")
 
 @app.route('/tags/<int:id>/edit', methods=['GET'])
 def edit_tag(id):
-    """display tag edit form"""
+    """Displays tag edit form"""
 
-    return render_template('edit_tag.html', name=name)
+    tag = Tag.query.get_or_404(id)
+
+    return render_template('edit_tag.html', tag=tag)
 
 @app.route('/tags/<int:id>/edit', methods=['POST'])
 def submit_edit_tag(id):
-    """handle edited tag submission"""
+    """Updates tag"""
+
+    name = request.form["tag-name"]
+
+    Tag.query.filter_by(id=id).update(dict(name=name))
+
+    db.session.commit()
 
     return redirect('/tags')
 
+
+# Delete
+
+@app.route('/users/<int:id>/delete', methods=['POST'])
+def delete_user(id):
+    """Removes user from database"""
+
+    # PostTag.query.filter_by() TODO
+
+    # Post.query.filter_by(user_id=id).delete()
+
+    # User.query.filter_by(id=id).delete()
+    # db.session.commit()
+
+    User.remove_user(id)
+
+    return redirect('/users')
+
+@app.route('/posts/<int:id>/delete', methods=['POST'])
+def delete_post(id):
+    """Removes post from database, redirects to post's author profile"""
+
+    user_id = Post.remove_post(id)
+
+    return redirect(f"/users/{user_id}")
+
 @app.route('/tags/<int:id>/delete', methods=['POST'])
 def delete_tag(id):
-    """delete tag"""
+    """Removes tag from database"""
 
-    redirect('/tags')
+    Tag.remove_tag(id)
+
+    return redirect('/tags')
+
 
 # Universal error route
 

@@ -15,7 +15,9 @@
 {% endif %}
 
 <a class="btn btn-primary" href="/tags/{{tag.id}}/edit">Edit</a>
-<a class="btn btn-danger" href="/tags/{{tag.id}}/delete">Delete</a>
+<form action="/tags/{{tag.id}}/delete" method="post">
+    <button class="btn btn-danger" type="submit">Delete</button>
+</form>
 <a class="btn btn-secondary" href="/tags">Back</a>
 
 {% endblock %}
