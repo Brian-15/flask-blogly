@@ -1,5 +1,6 @@
 """Models for Blogly."""
 
+from enum import unique
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import backref
 from sqlalchemy.sql.schema import ForeignKey
@@ -77,6 +78,10 @@ class Post(db.Model):
     user_id = db.Column(db.Integer,
                         db.ForeignKey('users.id'))
     
+    tags = db.relationship("Tag",
+                           secondary="post_tag",
+                           backref="posts")
+    
     def __repr__(self):
         """Show info about post"""
 
@@ -94,3 +99,42 @@ class Post(db.Model):
 
         db.session.add(self)
         db.session.commit()
+
+class Tag(db.Model):
+    """Tag model class"""
+
+    __tablename__ = "tags"
+
+    def __repr__(self):
+        """Show tag representation"""
+
+        t = self
+        return f"<Tag {t.id} {t.name}>"
+    
+    id = db.Column(db.Integer,
+                   primary_key=True,
+                   autoincrement=True)
+
+    name = db.Column(db.Text,
+                     nullable=False,
+                     unique=True)
+    
+
+class PostTag(db.Model):
+    """Model class for linking Tag and Post models"""
+
+    __tablename__ = "post_tag"
+
+    def __repr__(self):
+
+        pt = self
+        return f"<PostTag {pt.post_id} {pt.tag_id}>"
+    
+    post_id = db.Column(db.Integer,
+                        db.ForeignKey("posts.id"),
+                        primary_key=True)
+    
+    tag_id = db.Column(db.Integer,
+                       db.ForeignKey("tags.id"),
+                       primary_key=True)
+

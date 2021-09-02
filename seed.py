@@ -32,14 +32,11 @@ db.session.commit()
 
 # Add a few sample blog posts
 post1 = Post(title="SamplePost1", content="Hello World!", created_at="08/30/2021 07:37:16.00 PST", user_id=1,
-             tags=[PostTag(post_id=1, tag_id=1),
-                   PostTag(post_id=1, tag_id=2)])
+             tags=[tag1, tag2])
 post2 = Post(title="SamplePost2", content="Hellur World!", created_at="08/30/2021 07:37:16.00 PST", user_id=2,
-             tags=[PostTag(post_id=1, tag_id=3),
-                   PostTag(post_id=1, tag_id=2)])
+             tags=[tag2, tag3])
 post3 = Post(title="SamplePost3", content="Hello Wurld!", created_at="08/30/2021 07:37:16.00 PST", user_id=1,
-             tags=[PostTag(post_id=1, tag_id=1),
-                   PostTag(post_id=1, tag_id=3)])
+             tags=[tag1, tag3])
 
 # Add post data to staging area
 db.session.add_all([post1, post2, post3])
