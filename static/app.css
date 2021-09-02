@@ -8,7 +8,7 @@ div {
     padding: 1em;
 }
 
-.btn {
+div > * {
     margin: 1em;
 }
 

@@ -60,16 +60,11 @@ class User(db.Model):
 
     @classmethod
     def remove_user(self, id):
-
-        # PostTag.query.filter_by() TODO
+        """Removes user and all posts from database"""
 
         Post.remove_user_posts(id)
 
         self.query.filter_by(id=id).delete()
-
-        # Post.query.filter_by(user_id=id).delete()
-
-        # User.query.filter_by(id=id).delete()
 
         db.session.commit()
 
@@ -168,6 +163,7 @@ class Tag(db.Model):
     
     @classmethod
     def remove_tag(self, id):
+        """Removes all tags from database"""
 
         PostTag.delete_tags(id)
         Tag.query.filter_by(id=id).delete()
@@ -195,14 +191,14 @@ class PostTag(db.Model):
     
     @classmethod
     def delete_tags(self, tag_id):
-        """Delete relevant tags"""
+        """Delete relevant tags in post_tag table"""
 
         PostTag.query.filter_by(tag_id=tag_id).delete()
         db.session.commit()
     
     @classmethod
     def delete_posts(self, post_id):
-        """Delete relevant posts"""
+        """Delete relevant posts in post_tag table"""
 
         PostTag.query.filter_by(post_id=post_id).delete()
         db.session.commit()

@@ -8,6 +8,13 @@
 
 <p><i>{{post.user.full_name()}}</i></p>
 
+<div class="tags">
+    <a href="/tags">Tags: </a>
+    {% for tag in post.tags %}
+    <a class="btn-primary" href="/tags/{{tag.id}}">{{tag.name}}</a>
+    {% endfor %}
+</div>
+
 <div>
     <a class="btn btn-primary" href="/users/{{post.user_id}}">Cancel</a>
     <a class="btn btn-secondary" href="/posts/{{post.id}}/edit">Edit</a>
