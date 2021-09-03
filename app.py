@@ -19,7 +19,7 @@ db.create_all()
 # Create
 
 @app.route('/users/new', methods=['GET'])
-def show_user_form():
+def user_form():
     """Show user form"""
 
     return render_template("new_user.html")
@@ -95,7 +95,7 @@ def user_list():
     return render_template("users.html", users=users)
 
 @app.route('/users/<int:id>', methods = ['GET'])
-def get_user_profile(id):
+def user_profile(id):
     """Displays user profile"""
 
     user = User.query.get_or_404(id)
@@ -159,7 +159,7 @@ def edit_post(id):
     return render_template('edit_post.html', post=post, tags=tags)
 
 @app.route('/posts/<int:id>/edit', methods=['POST'])
-def submit_edit(id):
+def submit_post_edit(id):
     """Updates post"""
 
     title = request.form["title"]
@@ -198,13 +198,6 @@ def submit_edit_tag(id):
 @app.route('/users/<int:id>/delete', methods=['POST'])
 def delete_user(id):
     """Removes user from database"""
-
-    # PostTag.query.filter_by() TODO
-
-    # Post.query.filter_by(user_id=id).delete()
-
-    # User.query.filter_by(id=id).delete()
-    # db.session.commit()
 
     User.remove_user(id)
 
