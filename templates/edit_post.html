@@ -13,15 +13,16 @@
         <input type="text" name="content" id="content" placeholder="Text Content">
     </div>
     {% if post.tags %}
+    <div class="tag-container">
     
     {% for tag in tags%}
-    <div class="form-check">
+    <span class="form-check">
         <input class="form-check-input" type="checkbox" name="tags" id="{{tag.name}}"
         value="{{tag.id}}" {% if post.tags.__contains__(tag) %} checked {% endif %}>
         <label class="form-check-label" for="{{tag.name}}">{{tag.name}}</label>
-    </div>
+    </span>
     {% endfor %}
-
+    </div>
     {% else %}
     <p>No tags are currently available</p>
     {% endif %}

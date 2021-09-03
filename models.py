@@ -205,9 +205,18 @@ class PostTag(db.Model):
 
     @classmethod
     def update_tags(self, post_id, tag_ids):
+        """Deletes current tag-post associations, 
+        and adds list of tag_ids to table via add_tags method"""
 
         PostTag.query.filter_by(post_id=post_id).delete()
         db.session.commit()
+
+        PostTag.add_tags(post_id, tag_ids)
+
+    @classmethod
+    def add_tags(self, post_id, tag_ids):
+        """Adds tag entries for new post of id post_id.
+        Same as update_tags method except it does not delete any entries in database."""
 
         to_add = []
 

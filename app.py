@@ -43,8 +43,9 @@ def post_form(id):
     """Show form to add a post for user whose id=id"""
 
     user = User.query.get_or_404(id)
+    tags = Tag.query.all()
 
-    return render_template('new_post.html', user=user)
+    return render_template('new_post.html', user=user, tags=tags)
 
 @app.route('/users/<int:id>/posts/new', methods=['POST'])
 def post_form_submit(id):
@@ -52,10 +53,13 @@ def post_form_submit(id):
 
     title = request.form["title"]
     content = request.form["content"]
+    tags = request.form.getlist("tags")
 
     new_post = Post(title=title, content=content, user_id=id)
     db.session.add(new_post)
     db.session.commit()
+
+    PostTag.add_tags(new_post.id, tags)
 
     return redirect(f"/users/{id}")
 
