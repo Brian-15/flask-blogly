@@ -126,6 +126,8 @@ def show_tag(id):
     tag = Tag.query.get_or_404(id)
 
     return render_template('tag.html', tag=tag)
+
+
 # Update
 
 @app.route('/users/<int:id>/edit', methods = ['GET'])
@@ -151,16 +153,22 @@ def submit_user_edit(id):
 @app.route('/posts/<int:id>/edit', methods=['GET'])
 def edit_post(id):
     """Show post edit form"""
-    return render_template('edit_post.html', id=id)
+
+    post = Post.query.get_or_404(id)
+    tags = Tag.query.all()
+    return render_template('edit_post.html', post=post, tags=tags)
 
 @app.route('/posts/<int:id>/edit', methods=['POST'])
 def submit_edit(id):
     """Updates post"""
+
     title = request.form["title"]
     content = request.form["content"]
+    tag_ids = request.form.getlist("tags")
 
     edited_post = Post.query.get_or_404(id)
     edited_post.update(title, content)
+    PostTag.update_tags(id, tag_ids)
 
     return redirect(f"/posts/{id}")
 

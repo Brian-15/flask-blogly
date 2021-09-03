@@ -132,6 +132,7 @@ class Post(db.Model):
 
         for post in posts:
             Post.remove_post(post.id)
+    
 
 
 class Tag(db.Model):
@@ -169,7 +170,6 @@ class Tag(db.Model):
         Tag.query.filter_by(id=id).delete()
         db.session.commit()
         
-    
 
 class PostTag(db.Model):
     """Model class for linking Tag and Post models"""
@@ -203,3 +203,16 @@ class PostTag(db.Model):
         PostTag.query.filter_by(post_id=post_id).delete()
         db.session.commit()
 
+    @classmethod
+    def update_tags(self, post_id, tag_ids):
+
+        PostTag.query.filter_by(post_id=post_id).delete()
+        db.session.commit()
+
+        to_add = []
+
+        for tag_id in tag_ids:
+            to_add.append(PostTag(post_id=post_id, tag_id=tag_id))
+            
+        db.session.add_all(to_add)
+        db.session.commit()

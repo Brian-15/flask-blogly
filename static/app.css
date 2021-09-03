@@ -15,3 +15,7 @@ div > * {
 img {
     width: 200px;
 }
+
+.option-label {
+    margin: 0;
+}
