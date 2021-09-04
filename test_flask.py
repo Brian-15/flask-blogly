@@ -1,18 +1,26 @@
 """Integration test for app.py routes"""
 
 from unittest import TestCase
+
+from sqlalchemy.sql.operators import as_
 from app import app
 from models import User, Post, Tag, PostTag, db
+
+app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql:///blogly_test"
+app.config["SQLALCHEMY_ECHO"] = False
+
+db.app = app
 
 db.drop_all()
 db.create_all()
 
-class BloglyUserTestCase(TestCase):
+class BloglyTestCase(TestCase):
     """test cases for user routes"""
     
-    @classmethod
     def setUp(self):
         """empty tables, set up sample user and post models"""
+
+        db.create_all()
 
         PostTag.query.delete()
         Tag.query.delete()
@@ -37,16 +45,21 @@ class BloglyUserTestCase(TestCase):
         
         db.session.add(test_tag)
         db.session.commit()
+
+        test_post_tag = PostTag(post_id=test_post.id, tag_id=test_tag.id)
+
+        db.session.add(test_post_tag)
+        db.session.commit()
         
         self.user_id = test_user.id
         self.post_id = test_post.id
         self.tag_id = test_tag.id
 
-    @classmethod
     def tearDown(self):
         """rollback database"""
 
-        db.session.rollback()
+        db.session.remove()
+        db.drop_all()
 
     # CREATE
 
@@ -101,6 +114,27 @@ class BloglyUserTestCase(TestCase):
             self.assertEqual(response.status_code, 200)
             self.assertIn("TITLE", html)
     
+    def test_new_tag(self):
+        """test new tag form display"""
+
+        with app.test_client() as client:
+
+            response = client.get("/tags/new")
+            html = response.get_data(as_text=True)
+
+            self.assertEqual(response.status_code, 200)
+            self.assertIn("<h1>Create a tag</h1>", html)
+
+    def test_submit_new_tag(self):
+        """test new tag submission"""
+
+        with app.test_client() as client:
+
+            response = client.post("/tags/new", data={"name": "NEW_TAG"}, follow_redirects=True)
+            html = response.get_data(as_text=True)
+
+            self.assertEqual(response.status_code, 200)
+            self.assertIn("NEW_TAG", html)
 
     # READ
 
@@ -130,7 +164,7 @@ class BloglyUserTestCase(TestCase):
 
             self.assertEqual(response.status_code, 200)
             self.assertIn("FIRST_NAME LAST_NAME", html)
-            self.assertIn("https://unsplash.com/photos/2LowviVHZ-E", html)
+            self.assertIn("https://unsplash.com/photos/2LowviVHZ-E", html)    
 
     def test_view_post(self):
         """test post display page"""
@@ -143,6 +177,25 @@ class BloglyUserTestCase(TestCase):
             self.assertEqual(response.status_code, 200)
             self.assertIn("TITLE", html)
             self.assertIn("CONTENT", html)
+
+    def test_list_tags(self):
+        """test tag list display"""
+        with app.test_client() as client:
+            response = client.get("/tags")
+            html = response.get_data(as_text=True)
+
+            self.assertEqual(response.status_code, 200)
+            self.assertIn("TAG_NAME", html)
+
+    def test_show_tag(self):
+        """test tag details page display"""
+        with app.test_client() as client:
+            response = client.get(f"/tags/{self.tag_id}")
+            html = response.get_data(as_text=True)
+
+            self.assertEqual(response.status_code, 200)
+            self.assertIn("TAG_NAME", html)
+            self.assertIn("TITLE", html)
 
     # UPDATE
 
@@ -200,6 +253,29 @@ class BloglyUserTestCase(TestCase):
             self.assertIn("EDITED_TITLE", html)
             self.assertIn("EDITED_CONTENT", html)
 
+    def test_edit_tag(self):
+        """test tag edit form display"""
+        with app.test_client() as client:
+
+            response = client.get(f"/tags/{self.tag_id}/edit")
+            html = response.get_data(as_text=True)
+
+            self.assertEqual(response.status_code, 200)
+            self.assertIn("TAG_NAME", html) 
+            self.assertIn("<h1>Edit a tag</h1>", html)
+    
+    def test_submit_edit_tag(self):
+        """test tag edit submission"""
+        with app.test_client() as client:
+
+            response = client.post(f"/tags/{self.tag_id}/edit",
+                                   data={"name": "EDITED_TAG_NAME"},
+                                   follow_redirects=True)
+            html = response.get_data(as_text=True)
+
+            self.assertEqual(response.status_code, 200)
+            self.assertIn("EDITED_TAG_NAME", html)
+
     # DELETE
 
     def test_delete_user(self):
@@ -210,7 +286,7 @@ class BloglyUserTestCase(TestCase):
 
             self.assertEqual(response.status_code, 200)
             self.assertNotIn('FIRST_NAME LAST_NAME', html)
-            self.assertEqual(Post.query.filter_by(user_id=self.user_id).one_or_none(), None)
+            self.assertIsNone(Post.query.filter_by(user_id=self.user_id).one_or_none())
 
     def test_delete_post(self):
         """test post deletion route"""
@@ -225,10 +301,23 @@ class BloglyUserTestCase(TestCase):
             deleted_post = Post.query.filter_by(id=self.post_id).one_or_none()
 
             self.assertEqual(response.status_code, 200)
-            self.assertNotIn('TITLE', html)
-            self.assertEqual(deleted_post, None)
+            self.assertNotIn("TITLE", html)
+            self.assertIsNone(deleted_post)
 
+    def test_delete_tag(self):
+        """test tag deletion route"""
+        with app.test_client() as client:
 
+            response = client.post(f"/tags/{self.tag_id}/delete",
+                                   follow_redirects=True)
+            
+            html = response.get_data(as_text=True)
+
+            deleted_tag = Tag.query.filter_by(id=self.tag_id).one_or_none()
+
+            self.assertEqual(response.status_code, 200)
+            self.assertNotIn("TAG_NAME", html)
+            self.assertIsNone(deleted_tag)
 
 
 
